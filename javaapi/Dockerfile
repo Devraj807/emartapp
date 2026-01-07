@@ -1,5 +1,6 @@
 # Build stage
-FROM openjdk:21-jdk-slim AS BUILD_IMAGE
+# Build stage
+FROM eclipse-temurin:21-jdk AS build_image
 
 WORKDIR /usr/src/app/
 RUN apt-get update && apt-get install -y maven
@@ -7,11 +8,12 @@ COPY ./ /usr/src/app/
 RUN mvn install -DskipTests
 
 # Runtime stage
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre
 
 WORKDIR /usr/src/app/
-COPY --from=BUILD_IMAGE /usr/src/app/target/book-work-0.0.1-SNAPSHOT.jar ./book-work-0.0.1.jar
+COPY --from=build_image /usr/src/app/target/book-work-0.0.1-SNAPSHOT.jar ./book-work-0.0.1.jar
 
 EXPOSE 9000
 ENTRYPOINT ["java","-jar","book-work-0.0.1.jar"]
+
 
